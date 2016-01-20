@@ -86,11 +86,14 @@ Here are some examples of a request url:
   let INVALID = '/v1/api/article?include=user';
 ```
 
-## Missing implementation
+## Missing 'filter' implementation!
 
 Filters are not properly parsed since there are no specifications for this query yet! I hope to update this package
 as soon as filtering specs are available.
 
 
+## Missing Tests!
+
+Tests for the parser will be published ASAP!
 
 
