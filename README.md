@@ -92,8 +92,8 @@ Filters are not properly parsed since there are no specifications for this query
 as soon as filtering specs are available.
 
 
-## Missing Tests!
+## Missing Tests! - UPDATE: Not missing anymore!
 
-Tests for the parser will be published ASAP!
+Tests running using mocha & chai in /test
 
 
