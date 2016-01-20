@@ -7,15 +7,16 @@ To be used for ES6 node projects that make use of [JSON API](http://jsonapi.org/
 
 ## Installation
 
-Install using  `npm install jsonapi-query-parser`
-
+```sh
+$ npm install jsonapi-query-parser
+```
 
 ## Usage
 
 Require the module 'JsonApiQueryParser' into your application and use the 'parseRequest' function to convert the request.url to an easy
 usable requestData object.
 
-```
+```js
 let JsonApiQueryParser = require('JsonApiQueryParser');
 
 http.createServer(function (request, response) {
@@ -31,7 +32,7 @@ http.createServer(function (request, response) {
 The object returned by the JsonApiQueryParser.parseRequest will always be the same structure.
 Below you can see 2 parsed examples:
 
-```
+```js
 //EXAMPLE 1
 let url = '/article/5/relationships/comment'
 let requestData = {
@@ -67,7 +68,6 @@ let requestData = {
     filter: []
   }
 };
-
 ```
 
 
@@ -76,7 +76,7 @@ let requestData = {
 If your endpoints contain versioning or other application specific pointers please remove them before parsing!
 Here are some examples of a request url:
 
-```
+```js
   let CORRECT1 = '/article/';
   let CORRECT2 = '/article/5?include=comments';
   let CORRECT3 = '/article/5/relationships/comments';
