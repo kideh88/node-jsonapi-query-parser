@@ -1,0 +1,20 @@
+{
+  "name": "jsonapi-query-parser",
+  "version": "1.0.0",
+  "description": "Class to parse endpoint and its query parameters to a usable request object",
+  "main": "src/JsonApiQueryParser.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified yet\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kideh88/node-jsonapi-query-parser.git"
+  },
+  "keywords": ["node", "nodejs", "jsonapi", "query", "string", "parser", "parameters", "converter", "request", "parsing", "ES6"],
+  "author": "Kim Dehmlow",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kideh88/node-jsonapi-query-parser/issues"
+  },
+  "homepage": "https://github.com/kideh88/node-jsonapi-query-parser#readme"
+}
