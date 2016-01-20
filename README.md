@@ -17,7 +17,8 @@ Require the module 'JsonApiQueryParser' into your application and use the 'parse
 usable requestData object.
 
 ```js
-let JsonApiQueryParser = require('JsonApiQueryParser');
+let JsonApiQueryParserClass = require('jsonapi-query-parser');
+let JsonApiQueryParser = new JsonApiQueryParserClass();
 
 http.createServer(function (request, response) {
   let requestData = JsonApiQueryParser.parseRequest(request.url);
