@@ -2,7 +2,7 @@
 
 JsonApiQueryParser class to parse endpoint and its query string parameters to a usable request object.
 
-To be used for ES6 node projects that make use of [JSON API](http://jsonapi.org/)
+To be used for node projects that make use of [JSON API](http://jsonapi.org/)
 
 
 ## Installation
