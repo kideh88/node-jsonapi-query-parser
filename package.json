@@ -28,5 +28,9 @@
   "bugs": {
     "url": "https://github.com/kideh88/node-jsonapi-query-parser/issues"
   },
-  "homepage": "https://github.com/kideh88/node-jsonapi-query-parser#readme"
+  "homepage": "https://github.com/kideh88/node-jsonapi-query-parser#readme",
+  "devDependencies": {
+    "chai": "^3.4.1",
+    "mocha": "^2.3.4"
+  }
 }

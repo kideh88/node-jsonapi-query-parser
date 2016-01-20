@@ -40,7 +40,7 @@ class JsonApiQueryParser {
     requestData = this.parseEndpoint(urlSplit[0], requestData);
 
     if(urlSplit[1]) {
-      requestData = this.parseQueryParameters(urlSplit[1], requestData.queryData);
+      requestData.queryData = this.parseQueryParameters(urlSplit[1], requestData.queryData);
     }
 
     return requestData;
@@ -49,16 +49,18 @@ class JsonApiQueryParser {
   /**
    * [Cuts up the endpoint path to define the requested resource, identifier and relationships.]
    *
-   * @param {[string]} endpointString [Required endpoint string. Example: "/articles/6/comments".]
+   * @param {[string]} endpointString [Required endpoint string. Example: "articles/6/comments".]
    * @param {[object]} requestObject [Required reference to the main requestData object.]
    * @return {[object]} requestData [Parsed request information as object.]
    *
    **/
   parseEndpoint (endpointString, requestObject) {
     let requestSplit = JsonApiQueryParser.trimSlashes(endpointString).split('/');
+
     requestObject.resourceType = requestSplit[0];
-    requestObject.identifier = (requestSplit.length === 2 ? requestSplit[1] : null);
-    requestObject.relationships = (requestSplit.length === 3 && requestSplit[2].toLowerCase() === 'relationships');
+    requestObject.identifier = (requestSplit.length >= 2 ? requestSplit[1] : null);
+    requestObject.relationships = (requestSplit.length >= 3 && requestSplit[2].toLowerCase() === 'relationships');
+
     if(requestObject.relationships) {
       if(!requestSplit[3]) {
         throw new ReferenceError('Request missing relationship type', 'JsonApiQueryParser.js');
@@ -76,15 +78,15 @@ class JsonApiQueryParser {
    * [Cuts up the query parameters and sends each piece to the delegate function.]
    *
    * @param {[string]} queryString [Required query string. Example: "?include=comments,user&fields[article]=title,body" ]
-   * @param {[object]} requestObject [Required reference to the main requestData object.]
+   * @param {[object]} requestDataSubset [Required reference to the main requestData object.]
    * @return {[object]} requestData [Parsed request information as object.]
    *
    **/
-  parseQueryParameters (queryString, requestObject) {
+  parseQueryParameters (queryString, requestDataSubset) {
     let querySplit = queryString.split('&');
-    querySplit.forEach(this.delegateToParser, requestObject);
+    querySplit.forEach(this.delegateToParser, requestDataSubset);
 
-    return requestObject;
+    return requestDataSubset;
   }
 
   /**
@@ -110,27 +112,27 @@ class JsonApiQueryParser {
    * [Parses the include query string piece and returns the modified _requestDataSubset.]
    *
    * @param {[string]} includeString [Required include string piece. Example: "include=comments,user".]
-   * @param {[object]} _requestDataSubset [Required reference to the requestData.queryData object.]
-   * @return {[object]} _requestDataSubset [Returning the modified request data.]
+   * @param {[object]} requestDataSubset [Required reference to the requestData.queryData object.]
+   * @return {[object]} requestDataSubset [Returning the modified request data.]
    *
    **/
-  static parseInclude (includeString, _requestDataSubset) {
+  static parseInclude (includeString, requestDataSubset) {
     // Kept simple for now, does not parse dot-separated relationships (comment.user)
     let targetString = includeString.toLowerCase().replace('include=', '');
-    _requestDataSubset.include = targetString.split(',');
+    requestDataSubset.include = targetString.split(',');
 
-    return _requestDataSubset;
+    return requestDataSubset;
   }
 
   /**
    * [Parses the fields query string piece and returns the modified _requestDataSubset.]
    *
    * @param {[string]} fieldsString [Required fields query string piece. Example: "fields[article]=title,body".]
-   * @param {[object]} _requestDataSubset [Required reference to the requestData.queryData object.]
-   * @return {[object]} _requestDataSubset [Returning the modified request data.]
+   * @param {[object]} requestDataSubset [Required reference to the requestData.queryData object.]
+   * @return {[object]} requestDataSubset [Returning the modified request data.]
    *
    **/
-  static parseFields (fieldsString, _requestDataSubset) {
+  static parseFields (fieldsString, requestDataSubset) {
     let targetResource;
     let targetFields;
     let targetFieldsString;
@@ -144,25 +146,25 @@ class JsonApiQueryParser {
       return $1;
     });
 
-    _requestDataSubset.filter[targetResource] = (!_requestDataSubset.filter[targetResource] ? [] : _requestDataSubset.filter[targetResource]);
+    requestDataSubset.fields[targetResource] = (!requestDataSubset.fields[targetResource] ? [] : requestDataSubset.fields[targetResource]);
     targetFields = targetFieldsString.split(',');
 
     targetFields.forEach(function(targetField) {
-      _requestDataSubset.filter[targetResource].push(targetField);
+      requestDataSubset.fields[targetResource].push(targetField);
     });
 
-    return _requestDataSubset;
+    return requestDataSubset;
   }
 
   /**
    * [Parses the page query string piece and returns the modified _requestDataSubset.]
    *
    * @param {[string]} pageString [Required page query string piece. Example: "page[offset]=20".]
-   * @param {[object]} _requestDataSubset [Required reference to the requestData.queryData object.]
-   * @return {[object]} _requestDataSubset [Returning the modified request data.]
+   * @param {[object]} requestDataSubset [Required reference to the requestData.queryData object.]
+   * @return {[object]} requestDataSubset [Returning the modified request data.]
    *
    **/
-  static parsePage (pageString, _requestDataSubset) {
+  static parsePage (pageString, requestDataSubset) {
     let pageSettingKey;
     let pageSettingValue;
     let pageValueRegex = /^page.*?\=(.*?)$/i;
@@ -175,49 +177,55 @@ class JsonApiQueryParser {
       return $1;
     });
 
-    _requestDataSubset.page[pageSettingKey] = pageSettingValue;
+    requestDataSubset.page[pageSettingKey] = pageSettingValue;
 
-    return _requestDataSubset;
+    return requestDataSubset;
   }
 
   /**
    * [Parses the sort query string piece and returns the modified _requestDataSubset.]
    *
    * @param {[string]} sortString [Required sort query string piece. Example: "sort=-created,title".]
-   * @param {[object]} _requestDataSubset [Required reference to the requestData.queryData object.]
-   * @return {[object]} _requestDataSubset [Returning the modified request data.]
+   * @param {[object]} requestDataSubset [Required reference to the requestData.queryData object.]
+   * @return {[object]} requestDataSubset [Returning the modified request data.]
    *
    **/
-  static parseSort (sortString, _requestDataSubset) {
+  static parseSort (sortString, requestDataSubset) {
     let targetString = sortString.toLowerCase().replace('sort=', '');
-    _requestDataSubset.sort = targetString.split(',');
+    requestDataSubset.sort = targetString.split(',');
 
-    return _requestDataSubset;
+    return requestDataSubset;
   }
 
   /**
    * [Not implemented due to lack of specifications, instead it will save the filter query in requestData.filter.]
    *
    * @param {[string]} filterString [Required sort query string piece. Example: MISSING.]
-   * @param {[object]} _requestDataSubset [Required reference to the requestData.queryData object.]
-   * @return {[object]} _requestDataSubset [Returning the modified request data.]
+   * @param {[object]} requestDataSubset [Required reference to the requestData.queryData object.]
+   * @return {[object]} requestDataSubset [Returning the modified request data.]
    *
    **/
-  static parseFilter (filterString, _requestDataSubset) {
+  static parseFilter (filterString, requestDataSubset) {
     // NOT IMPLEMENTED PROPERLY, WILL KEEP STRINGS IN FILTER ARRAY
-    _requestDataSubset.filter.push(filterString);
-    return _requestDataSubset;
+    requestDataSubset.filter.push(filterString);
+    return requestDataSubset;
   }
 
   /**
-   * [Slash trim to avoid faulty endpoint mapping.]
+   * [Slash trim to avoid faulty endpoint mapping. Runs recursively to remove any double slash errors]
    *
    * @param {[string]} input [Required input to be trimmed. Example: "/article/1/".]
    * @return {[string]} [Returning the modified string.]
    *
    **/
   static trimSlashes (input) {
-    return input.replace(/(^\/)|(\/$)/g, "");
+    let slashPattern = /(^\/)|(\/$)/;
+    let trimmed = input.replace(slashPattern, "");
+    if(slashPattern.test(trimmed)) {
+      return JsonApiQueryParser.trimSlashes(trimmed);
+    } else {
+      return trimmed;
+    }
   };
 
 }
