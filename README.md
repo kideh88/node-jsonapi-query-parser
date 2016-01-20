@@ -20,9 +20,10 @@ let JsonApiQueryParser = require('JsonApiQueryParser');
 
 http.createServer(function (request, response) {
   let requestData = JsonApiQueryParser.parseRequest(request.url);
+
+  // .. Do stuff with your requestData object
+
 }).listen(1337, '127.0.0.1');
-
-
 ```
 
 ## Return data information (requestData)
@@ -76,17 +77,19 @@ If your endpoints contain versioning or other application specific pointers plea
 Here are some examples of a request url:
 
 ```
-  let CORRECT1 = '/article/'
-  let CORRECT2 = '/article/5?include=comments'
-  let CORRECT3 = '/article/5/relationships/comments'
-  let CORRECT4 = '/article/?include=user,comment.rating&fields[article]=title,body&fields[user]=name'
-  let WRONG = '/v1/api/article?include=user
+  let CORRECT1 = '/article/';
+  let CORRECT2 = '/article/5?include=comments';
+  let CORRECT3 = '/article/5/relationships/comments';
+  let CORRECT4 = '/article/?include=user,comment.rating&fields[article]=title,body&fields[user]=name';
+
+  // Contains '/v1/api' which cannot be parsed properly
+  let INVALID = '/v1/api/article?include=user';
 ```
 
 ## Missing implementation
 
-Filters are not properly parsed since there are no proper specifications on this part yet! I hope to update this package
-as soon as filtering specs are set.
+Filters are not properly parsed since there are no specifications for this query yet! I hope to update this package
+as soon as filtering specs are available.
 
 
 
