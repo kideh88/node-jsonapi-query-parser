@@ -206,7 +206,7 @@ class JsonApiQueryParser {
    *
    **/
   static parseFilter (filterString, requestDataSubset) {
-    // NOT IMPLEMENTED PROPERLY, WILL KEEP STRINGS IN FILTER ARRAY
+    // NOT IMPLEMENTED PROPERLY YET, WILL KEEP STRINGS IN FILTER ARRAY
     requestDataSubset.filter.push(filterString);
     return requestDataSubset;
   }

@@ -1,4 +1,4 @@
-# node-jsonapi-query-parser
+# jsonapi-query-parser
 
 JsonApiQueryParser class to parse endpoint and its query string parameters to a usable request object.
 
@@ -89,11 +89,11 @@ Here are some examples of a request url:
 
 ## Missing 'filter' implementation!
 
-Filters are not properly parsed since there are no specifications for this query yet! I hope to update this package
+Filters might not properly parsed since there are no specifications for this query yet! I hope to update this package
 as soon as filtering specs are available.
 
 
-## Missing Tests! - UPDATE: Not missing anymore!
+## Tests!
 
 Tests running using mocha & chai in /test
 
