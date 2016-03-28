@@ -1,10 +1,10 @@
 {
   "name": "jsonapi-query-parser",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Class to parse endpoint and its query parameters to a usable request object",
   "main": "src/JsonApiQueryParser.js",
   "scripts": {
-    "test": "echo \"Error: no test specified yet\" && exit 1"
+    "test": "mocha"
   },
   "repository": {
     "type": "git",

@@ -47,7 +47,6 @@ describe('JsonApiQueryParser', function () {
 
       testString = '//article/5/relationships/comment?include=user,comment&sort=age&&fields[user]=name,email&page[limit]=20&filter=test';
       testData = parserClass.parseRequest(testString, requestData);
-      console.log('testData', testData);
 
       expectedData = {
         resourceType: 'article',
