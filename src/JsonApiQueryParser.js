@@ -118,7 +118,7 @@ class JsonApiQueryParser {
    **/
   static parseInclude (includeString, requestDataSubset) {
     // Kept simple for now, does not parse dot-separated relationships (comment.user)
-    let targetString = includeString.toLowerCase().replace('include=', '');
+    let targetString = includeString.split('=')[1];
     requestDataSubset.include = targetString.split(',');
 
     return requestDataSubset;
@@ -191,7 +191,7 @@ class JsonApiQueryParser {
    *
    **/
   static parseSort (sortString, requestDataSubset) {
-    let targetString = sortString.toLowerCase().replace('sort=', '');
+    let targetString = sortString.split('=')[1];
     requestDataSubset.sort = targetString.split(',');
 
     return requestDataSubset;
