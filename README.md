@@ -46,7 +46,7 @@ let requestData = {
     fields: {},
     sort: [],
     page: {},
-    filter: []
+    filter: {}
   }
 };
 
@@ -66,7 +66,7 @@ let requestData = {
     page: {
       limit: 20
     },
-    filter: []
+    filter: {}
   }
 };
 ```
@@ -87,11 +87,32 @@ Here are some examples of a request url:
   let INVALID = '/v1/api/article?include=user';
 ```
 
-## Missing 'filter' implementation!
+## Custom 'filter' implementation!
 
-Filters might not properly parsed since there are no specifications for this query yet! I hope to update this package
+Filters might not be properly parsed since there are no specifications for this query yet! I hope to update this package
 as soon as filtering specs are available.
+For now the filters are handled like the fields parameter.
 
+```js
+//EXAMPLE 1
+let url = '/article/5?filter[name]=john%20doe&filter[age]=15'
+let requestData = {
+  resourceType: 'article',
+  identifier: '5',
+  relationships: false,
+  relationshipType: null,
+  queryData: {
+    include: [],
+    fields: {},
+    sort: [],
+    page: {},
+    filter: {
+      name: 'john%20doe',
+      age: '15'
+    }
+  }
+};
+```
 
 ## Tests!
 
