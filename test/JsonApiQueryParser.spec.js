@@ -45,7 +45,7 @@ describe('JsonApiQueryParser', function () {
       var testString, testData, expectedData;
       var parserClass = new JsonApiQueryParser();
 
-      testString = '//article/5/relationships/comment?include=user,comment&sort=age&&fields[user]=name,email&page[limit]=20&filter[name]=test';
+      testString = '//article/5/relationships/comment?include=user,comment&sort=age&&fields[user]=name,email&page[limit]=20&filter[name]=test&filter[age]=15';
       testData = parserClass.parseRequest(testString, requestData);
 
       expectedData = {
@@ -63,7 +63,8 @@ describe('JsonApiQueryParser', function () {
             limit: '20'
           },
           filter: {
-            name: 'test'
+            name: 'test',
+            age: '15'
           }
         }
       };
