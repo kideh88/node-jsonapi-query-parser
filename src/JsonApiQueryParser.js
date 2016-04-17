@@ -40,7 +40,7 @@ class JsonApiQueryParser {
     requestData = this.parseEndpoint(urlSplit[0], requestData);
 
     if(urlSplit[1]) {
-      requestData.queryData = this.parseQueryParameters(urlSplit[1], requestData.queryData);
+      requestData.queryData = this.parseQueryParameters(decodeURIComponent(urlSplit[1]), requestData.queryData);
     }
 
     return requestData;
