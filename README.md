@@ -31,6 +31,7 @@ http.createServer(function (request, response) {
 ## Return data information (requestData)
 
 The object returned by the JsonApiQueryParser.parseRequest will always be the same structure.
+Please note that the query parameters are decoded when parsed!
 Below you can see 2 parsed examples:
 
 ```js
@@ -51,7 +52,7 @@ let requestData = {
 };
 
 //EXAMPLE 2
-let url = '/article/5/?include=user,comment.user&fields[article]=title,body&page[limit]=20&sort=-createdon'
+let url = '/article/5/?include=user,comment.user&fields[article]=title%2Cbody&page[limit]=20&sort=-createdon'
 let requestData = {
   resourceType: 'article',
   identifier: '5',
@@ -107,7 +108,7 @@ let requestData = {
     sort: [],
     page: {},
     filter: {
-      name: 'john%20doe',
+      name: 'john doe',
       age: '15'
     }
   }

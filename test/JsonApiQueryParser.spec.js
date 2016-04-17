@@ -45,7 +45,7 @@ describe('JsonApiQueryParser', function () {
       var testString, testData, expectedData;
       var parserClass = new JsonApiQueryParser();
 
-      testString = '//article/5/relationships/comment?include=user,testComment&sort=Age,firstName&&fields[user]=name,email&page[limit]=20&filter[name]=test&filter[age]=15';
+      testString = '//article/5/relationships/comment?include=user,testComment&sort=Age%2CfirstName&&fields[user]=name,email&page[limit]=20&filter[name]=john%20doe&filter[age]=15';
       testData = parserClass.parseRequest(testString, requestData);
 
       expectedData = {
@@ -63,7 +63,7 @@ describe('JsonApiQueryParser', function () {
             limit: '20'
           },
           filter: {
-            name: 'test',
+            name: 'john doe',
             age: '15'
           }
         }
@@ -297,7 +297,7 @@ describe('JsonApiQueryParser', function () {
 
       expect(testData).to.deep.equal(expectedData);
 
-      let filterString2 = 'filter[name]=john%20doe';
+      let filterString2 = 'filter[name]=john doe';
       let testData2 = JsonApiQueryParser.parseFilter(filterString2, testData);
       let expectedData2 = {
         include: [],
@@ -306,7 +306,7 @@ describe('JsonApiQueryParser', function () {
         page: {},
         filter: {
           id: '5',
-          name: 'john%20doe'
+          name: 'john doe'
         }
       };
       expect(testData2).to.deep.equal(expectedData2);
