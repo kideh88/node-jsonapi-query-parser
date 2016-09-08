@@ -21,7 +21,15 @@ describe('JsonApiQueryParser', function () {
         fields: {},
         sort: [],
         page: {},
-        filter: {}
+        filter: {},
+        filterType: {
+          like: {},
+          not: {},
+          lt: {},
+          lte: {},
+          gt: {},
+          gte: {}
+        }
       }
     };
 
@@ -30,7 +38,15 @@ describe('JsonApiQueryParser', function () {
       fields: {},
       sort: [],
       page: {},
-      filter: {}
+      filter: {},
+      filterType: {
+        like: {},
+        not: {},
+        lt: {},
+        lte: {},
+        gt: {},
+        gte: {}
+      }
     };
   });
 
@@ -45,7 +61,8 @@ describe('JsonApiQueryParser', function () {
       var testString, testData, expectedData;
       var parserClass = new JsonApiQueryParser();
 
-      testString = '//article/5/relationships/comment?include=user,testComment&sort=Age%2CfirstName&&fields[user]=name,email&page[limit]=20&filter[name]=john%20doe&filter[age]=15';
+      testString = '//article/5/relationships/comment?include=user,testComment&sort=Age%2CfirstName&&fields[user]=name,email&page[limit]=20' 
+                    + '&filter[name]=john%20doe&filter[age]=15&filterType[like][name]=john,joe&filterType[not][age]=30&filterType[gt][age]=17';
       testData = parserClass.parseRequest(testString, requestData);
 
       expectedData = {
@@ -65,6 +82,20 @@ describe('JsonApiQueryParser', function () {
           filter: {
             name: 'john doe',
             age: '15'
+          },
+          filterType: {
+            like: {
+              name: 'john,joe'
+            },
+            not: {
+              age: '30'
+            },
+            lt: {},
+            lte: {},
+            gt: {
+              age: '17'
+            },
+            gte: {}
           }
         }
       };
@@ -91,7 +122,15 @@ describe('JsonApiQueryParser', function () {
           fields: {},
           sort: [],
           page: {},
-          filter: {}
+          filter: {},
+          filterType: {
+            like: {},
+            not: {},
+            lt: {},
+            lte: {},
+            gt: {},
+            gte: {}
+          }
         }
       };
 
@@ -110,7 +149,15 @@ describe('JsonApiQueryParser', function () {
           fields: {},
           sort: [],
           page: {},
-          filter: {}
+          filter: {},
+          filterType: {
+            like: {},
+            not: {},
+            lt: {},
+            lte: {},
+            gt: {},
+            gte: {}
+          }
         }
       };
 
@@ -153,6 +200,14 @@ describe('JsonApiQueryParser', function () {
         },
         filter: {
           name: 'test'
+        },
+        filterType: {
+          like: {},
+          not: {},
+          lt: {},
+          lte: {},
+          gt: {},
+          gte: {}
         }
       };
 
@@ -163,10 +218,19 @@ describe('JsonApiQueryParser', function () {
         fields: {},
         sort: [],
         page: {},
-        filter: {}
+        filter: {},
+        filterType: {
+          like: {},
+          not: {},
+          lt: {},
+          lte: {},
+          gt: {},
+          gte: {}
+        }
       };
 
-      testString = '&&include=user&page[offset]=200&sort=age,-id&fields[user]=name,email&&fields[article]=title,body&page[limit]=20&filter[name]=test&filter[lastname]=another';
+      testString = '&&include=user&page[offset]=200&sort=age,-id&fields[user]=name,email&&fields[article]=title,body&page[limit]=20'
+                    + '&filter[name]=test&filter[lastname]=another&filterType[like][name]=boo';
       testData = parserClass.parseQueryParameters(testString, requestDataSubset);
 
       expectedData = {
@@ -183,6 +247,16 @@ describe('JsonApiQueryParser', function () {
         filter: {
           name: 'test',
           lastname: 'another'
+        },
+        filterType: {
+          like: {
+            name: 'boo'
+          },
+          not: {},
+          lt: {},
+          lte: {},
+          gt: {},
+          gte: {}
         }
       };
 
@@ -200,7 +274,15 @@ describe('JsonApiQueryParser', function () {
         fields: {},
         sort: [],
         page: {},
-        filter: {}
+        filter: {},
+        filterType: {
+          like: {},
+          not: {},
+          lt: {},
+          lte: {},
+          gt: {},
+          gte: {}
+        }
       };
 
       expect(testData).to.deep.equal(expectedData);
@@ -229,7 +311,15 @@ describe('JsonApiQueryParser', function () {
         },
         sort: [],
         page: {},
-        filter: {}
+        filter: {},
+        filterType: {
+          like: {},
+          not: {},
+          lt: {},
+          lte: {},
+          gt: {},
+          gte: {}
+        }
       };
 
       expect(testData).to.deep.equal(expectedData);
@@ -256,7 +346,15 @@ describe('JsonApiQueryParser', function () {
           limit: '20',
           offset: '180'
         },
-        filter: {}
+        filter: {},
+        filterType: {
+          like: {},
+          not: {},
+          lt: {},
+          lte: {},
+          gt: {},
+          gte: {}
+        }
       };
 
       expect(testData).to.deep.equal(expectedData);
@@ -273,7 +371,15 @@ describe('JsonApiQueryParser', function () {
         fields: {},
         sort: ['-createdon', 'type'],
         page: {},
-        filter: {}
+        filter: {},
+        filterType: {
+          like: {},
+          not: {},
+          lt: {},
+          lte: {},
+          gt: {},
+          gte: {}
+        }
       };
 
       expect(testData).to.deep.equal(expectedData);
@@ -292,6 +398,14 @@ describe('JsonApiQueryParser', function () {
         page: {},
         filter: {
           id: '5'
+        },
+        filterType: {
+          like: {},
+          not: {},
+          lt: {},
+          lte: {},
+          gt: {},
+          gte: {}
         }
       };
 
@@ -307,6 +421,64 @@ describe('JsonApiQueryParser', function () {
         filter: {
           id: '5',
           name: 'john doe'
+        },
+        filterType: {
+          like: {},
+          not: {},
+          lt: {},
+          lte: {},
+          gt: {},
+          gte: {}
+        }
+      };
+      expect(testData2).to.deep.equal(expectedData2);
+    });
+  });
+
+  describe('parseFilterType function', function() {
+    it('should place the values of the filterType strings to their matching queryData filterType objects.', function() {
+      let filterString = 'filterType[not][name]=jack';
+
+      let testData = JsonApiQueryParser.parseFilterType(filterString, requestDataSubset);
+      let expectedData = {
+        include: [],
+        fields: {},
+        sort: [],
+        page: {},
+        filter: {},
+        filterType: {
+            like: {},
+            not: {
+              name: 'jack'
+            },
+            lt: {},
+            lte: {},
+            gt: {},
+            gte: {}
+        }
+      };
+
+      expect(testData).to.deep.equal(expectedData);
+
+      let filterString2 = 'filterType[lt][age]=24';
+      let testData2 = JsonApiQueryParser.parseFilterType(filterString2, testData);
+      let expectedData2 = {
+        include: [],
+        fields: {},
+        sort: [],
+        page: {},
+        filter: {},
+        filterType: {
+            like: {},
+            not: {
+              name: 'jack'
+            },
+            lt: {
+              age: '24'
+            },
+            lte: {},
+            gt: {},
+            gte: {}
         }
       };
       expect(testData2).to.deep.equal(expectedData2);

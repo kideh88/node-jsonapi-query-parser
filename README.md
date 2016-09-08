@@ -47,7 +47,15 @@ let requestData = {
     fields: {},
     sort: [],
     page: {},
-    filter: {}
+    filter: {},
+    filterType: {
+      like: {},
+      not: {},
+      lt: {},
+      lte: {},
+      gt: {},
+      gte: {}
+    }
   }
 };
 
@@ -67,7 +75,15 @@ let requestData = {
     page: {
       limit: 20
     },
-    filter: {}
+    filter: {},
+    filterType: {
+      like: {},
+      not: {},
+      lt: {},
+      lte: {},
+      gt: {},
+      gte: {}
+    }
   }
 };
 ```
@@ -94,9 +110,12 @@ Filters might not be properly parsed since there are no specifications for this 
 as soon as filtering specs are available.
 For now the filters are handled like the fields parameter.
 
+FilterType is also not supported by JSON API spec. This feature can be used to filter on partial matches, less than, greater than, and more. 
+The feature is currently implemented for [bookshelf-jsonapi-params](https://github.com/scoutforpets/bookshelf-jsonapi-params).
+
 ```js
 //EXAMPLE 1
-let url = '/article/5?filter[name]=john%20doe&filter[age]=15'
+let url = '/article/5?filter[name]=john%20doe&&filterType[lt][age]=15'
 let requestData = {
   resourceType: 'article',
   identifier: '5',
@@ -110,6 +129,16 @@ let requestData = {
     filter: {
       name: 'john doe',
       age: '15'
+    },
+    filterType: {
+      like: {},
+      not: {},
+      lt: {
+        age: '15'
+      },
+      lte: {},
+      gt: {},
+      gte: {}
     }
   }
 };
