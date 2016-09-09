@@ -47,8 +47,7 @@ let requestData = {
     fields: {},
     sort: [],
     page: {},
-    filter: {},
-    filterType: {
+    filter: {
       like: {},
       not: {},
       lt: {},
@@ -75,8 +74,7 @@ let requestData = {
     page: {
       limit: 20
     },
-    filter: {},
-    filterType: {
+    filter: {
       like: {},
       not: {},
       lt: {},
@@ -115,7 +113,7 @@ The feature is currently implemented for [bookshelf-jsonapi-params](https://gith
 
 ```js
 //EXAMPLE 1
-let url = '/article/5?filter[name]=john%20doe&&filterType[lt][age]=15'
+let url = '/article/5?filter[name]=john%20doe&&filter[age][lt]=15'
 let requestData = {
   resourceType: 'article',
   identifier: '5',
@@ -128,9 +126,7 @@ let requestData = {
     page: {},
     filter: {
       name: 'john doe',
-      age: '15'
-    },
-    filterType: {
+      age: '15',
       like: {},
       not: {},
       lt: {
