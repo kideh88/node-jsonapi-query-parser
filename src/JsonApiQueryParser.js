@@ -8,8 +8,8 @@ let PARSE_PARAM = Object.freeze({
   parseFields: /^fields\[(.*?)\]\=.*?$/i,
   parsePage: /^page\[(.*?)\]\=.*?$/i,
   parseSort: /^sort\=(.*?)/i,
-  parseFilter: /^filter\[(.*?)\]\=.*?$/i,
-  parseFilterType: /^filterType\[(.*?)\]\[(.*?)\]\=.*?$/i
+  parseFilter: /^filter\[([^\]]*?)\]\=.*?$/i,
+  parseFilterType: /^filter\[(.*?)\]\[(.*?)\]\=(.*?)$/i
 });
 
 
@@ -33,8 +33,7 @@ class JsonApiQueryParser {
         fields: {},
         sort: [],
         page: {},
-        filter: {},
-        filterType: {
+        filter: {
           like: {},
           not: {},
           lt: {},
@@ -240,7 +239,7 @@ class JsonApiQueryParser {
    * [Note: The are no proper specifications for this parameter yet.
    * For now the filter is implemented similar to the fields parameter. Values should be url encoded to allow for special characters.]
    *
-   * @param {[string]} filterString [Required sort query string piece. Example: "filter[like][name]=John%20Doe".]
+   * @param {[string]} filterString [Required sort query string piece. Example: "filter[name][like]=John%20Doe".]
    * @param {[object]} requestDataSubset [Required reference to the requestData.queryData object.]
    * @return {[object]} requestDataSubset [Returning the modified request data.]
    *
@@ -249,22 +248,21 @@ class JsonApiQueryParser {
     let targetType;
     let targetColumn;
     let targetFilterString;
-    let filterNameRegex = /^filter.*?\=(.*?)$/i;
 
-    targetType = filterString.replace(PARSE_PARAM.parseFilterType, function(match, $1, $2, $3) {
+    targetColumn = filterString.replace(PARSE_PARAM.parseFilterType, function(match, $1) {
       return $1;
     });
 
-    targetColumn = filterString.replace(PARSE_PARAM.parseFilterType, function(match, $1, $2, $3) {
+    targetType = filterString.replace(PARSE_PARAM.parseFilterType, function(match, $1, $2) {
       return $2;
     });
 
-    targetFilterString = filterString.replace(filterNameRegex, function(match, $1, $2, $3) {
-      return $1;
+    targetFilterString = filterString.replace(PARSE_PARAM.parseFilterType, function(match, $1, $2, $3) {
+      return $3;
     });
 
-    if(requestDataSubset.filterType[targetType]){
-      requestDataSubset.filterType[targetType][targetColumn] = targetFilterString;
+    if(requestDataSubset.filter[targetType]){
+      requestDataSubset.filter[targetType][targetColumn] = targetFilterString;
     }
 
     return requestDataSubset;
