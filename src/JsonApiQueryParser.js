@@ -249,11 +249,11 @@ class JsonApiQueryParser {
     let targetColumn;
     let targetFilterString;]
     
-    targetType = filterString.replace(PARSE_PARAM.parseFilterType, function(match, $1, $2) {
+    targetType = filterString.replace(PARSE_PARAM.parseFilterType, function(match, $1) {
       return $1;
     });
     
-    targetColumn = filterString.replace(PARSE_PARAM.parseFilterType, function(match, $1) {
+    targetColumn = filterString.replace(PARSE_PARAM.parseFilterType, function(match, $1, $2) {
       return $2;
     });
 
