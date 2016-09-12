@@ -247,7 +247,7 @@ class JsonApiQueryParser {
   static parseFilterType (filterString, requestDataSubset) {
     let targetType;
     let targetColumn;
-    let targetFilterString;]
+    let targetFilterString;
     
     targetType = filterString.replace(PARSE_PARAM.parseFilterType, function(match, $1) {
       return $1;
