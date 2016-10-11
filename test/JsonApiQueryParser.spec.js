@@ -60,7 +60,7 @@ describe('JsonApiQueryParser', function () {
       var parserClass = new JsonApiQueryParser();
 
       testString = '//article/5/relationships/comment?include=user,testComment&sort=Age%2CfirstName&&fields[user]=name,email&page[limit]=20' 
-                    + '&filter[name]=john%20doe&filter[age]=15&filter[name][like]=john,joe&filter[age][not]=30&filter[age][gt]=17';
+                    + '&filter[name]=john%20doe&filter[age]=15&filter[like][name]=john,joe&filter[not][age]=30&filter[gt][age]=17';
       testData = parserClass.parseRequest(testString, requestData);
 
       expectedData = {
@@ -221,7 +221,7 @@ describe('JsonApiQueryParser', function () {
       };
 
       testString = '&&include=user&page[offset]=200&sort=age,-id&fields[user]=name,email&&fields[article]=title,body&page[limit]=20'
-                    + '&filter[name]=test&filter[lastname]=another&filter[name][like]=boo';
+                    + '&filter[name]=test&filter[lastname]=another&filter[like][name]=boo';
       testData = parserClass.parseQueryParameters(testString, requestDataSubset);
 
       expectedData = {
@@ -418,7 +418,7 @@ describe('JsonApiQueryParser', function () {
 
   describe('parseFilterType function', function() {
     it('should place the values of the filterType strings to their matching queryData filterType objects.', function() {
-      let filterString = 'filter[name][not]=jack';
+      let filterString = 'filter[not][name]=jack';
 
       let testData = JsonApiQueryParser.parseFilterType(filterString, requestDataSubset);
       let expectedData = {
@@ -440,7 +440,7 @@ describe('JsonApiQueryParser', function () {
 
       expect(testData).to.deep.equal(expectedData);
 
-      let filterString2 = 'filter[age][lt]=24';
+      let filterString2 = 'filter[lt][age]=24';
       let testData2 = JsonApiQueryParser.parseFilterType(filterString2, testData);
       let expectedData2 = {
         include: [],
