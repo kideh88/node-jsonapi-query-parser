@@ -113,6 +113,32 @@ let requestData = {
     }
   }
 };
+
+// alechirsh filter type implementation:
+let url = '/article/5?filter[not][name]=jack'
+let requestData = {
+  resourceType: 'article',
+  identifier: '5',
+  relationships: false,
+  relationshipType: null,
+  queryData: {
+    include: [],
+    fields: {},
+    sort: [],
+    page: {},
+    filter: {
+      like: {},
+      not: {
+        name: 'jack'
+      },
+      lt: {},
+      lte: {},
+      gt: {},
+      gte: {}
+    }
+  }
+};
+
 ```
 
 ## Tests!
