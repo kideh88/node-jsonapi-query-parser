@@ -202,7 +202,7 @@ class JsonApiQueryParser {
    *
    **/
   static parseSort (sortString, requestDataSubset) {
-    let targetString = sortString.split(/=(.+)/)[1];
+    let targetString = sortString.split(/=(.+)/)[1] || '';
     requestDataSubset.sort = targetString.split(',');
 
     return requestDataSubset;
