@@ -369,6 +369,28 @@ describe('JsonApiQueryParser', function () {
 
       expect(testData).to.deep.equal(expectedData);
     });
+
+    it('should parse a sort value containing an \'=\' character', function() {
+      let sortString = 'sort=-(value1=test),value2';
+
+      let testData = JsonApiQueryParser.parseSort(sortString, requestDataSubset);
+      let expectedData = {
+        include: [],
+        fields: {},
+        sort: ['-(value1=test)', 'value2'],
+        page: {},
+        filter: {
+          like: {},
+          not: {},
+          lt: {},
+          lte: {},
+          gt: {},
+          gte: {}
+        }
+      };
+
+      expect(testData).to.deep.equal(expectedData);
+    });
   });
 
   describe('parseFilter function', function() {
