@@ -164,6 +164,51 @@ let requestData = {
   }
 };
 
+//EXAMPLE 3 "OR" filtering condition:
+let url = '/users?filter[or][0][not][name]=jack&filter[or][0][name]=sally&filter[or][1][type]=customer&filter[lte][age]=30'
+let requestData = {
+  resourceType: 'users',
+  relationships: false,
+  relationshipType: null,
+  queryData: {
+    include: [],
+    fields: {},
+    sort: [],
+    page: {},
+    filter: {
+      or: [
+        {
+          like: {},
+          not: {
+            name: 'jack'
+          },
+          lt: {},
+          lte: {},
+          gt: {},
+          gte: {},
+          name: 'sally'          
+        },
+        {
+          like: {},
+          not: {},
+          lt: {},
+          lte: {},
+          gt: {},
+          gte: {},
+          type: 'customer'  
+        }
+      ]
+      like: {},
+      not: {},
+      lt: {},
+      lte: {
+        age: '30'
+      },
+      gt: {},
+      gte: {}
+    }
+  }
+};
 ```
 
 ## Tests!
