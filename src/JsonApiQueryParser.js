@@ -3,18 +3,17 @@
 /**
  * [Defines the available parse function names and their matching patterns.]
  **/
-let PARSE_PARAM = Object.freeze({
+const PARSE_PARAM = Object.freeze ({
   parseInclude: /^include\=(.*?)/i,
   parseFields: /^fields\[(.*?)\]\=.*?$/i,
   parsePage: /^page\[(.*?)\]\=.*?$/i,
   parseSort: /^sort\=(.*?)/i,
   parseFilter: /^filter\[([^\]]*?)\]\=.*?$/i,
-  parseFilterType: /^filter\[(.*?)\]\[(.*?)\]\=(.*?)$/i
+  parseFilterType: /^filter\[([^or].*?)\]\[(.*?)\]\=(.*?)$/i,
+  parseFilterWithOr: /^filter\[or\]\[(\d+)\](\[[^or].*?\]\[.*?\]\=.*?|\[[^\]]*?\]\=.*?){1}$/i,
 });
 
-
 class JsonApiQueryParser {
-
   /**
    * [Defines the requestData object to modify via given queryString. NOTE: filter query is not implemented due to lack of specs.]
    *
@@ -34,21 +33,25 @@ class JsonApiQueryParser {
         sort: [],
         page: {},
         filter: {
+          or: [],
           like: {},
           not: {},
           lt: {},
           lte: {},
           gt: {},
-          gte: {}
-        }
-      }
+          gte: {},
+        },
+      },
     };
 
-    let urlSplit = url.split('?');
-    requestData = this.parseEndpoint(urlSplit[0], requestData);
+    let urlSplit = url.split ('?');
+    requestData = this.parseEndpoint (urlSplit[0], requestData);
 
-    if(urlSplit[1]) {
-      requestData.queryData = this.parseQueryParameters(urlSplit[1], requestData.queryData);
+    if (urlSplit[1]) {
+      requestData.queryData = this.parseQueryParameters (
+        urlSplit[1],
+        requestData.queryData
+      );
     }
 
     return requestData;
@@ -63,20 +66,31 @@ class JsonApiQueryParser {
    *
    **/
   parseEndpoint (endpointString, requestObject) {
-    let requestSplit = JsonApiQueryParser.trimSlashes(endpointString).split('/');
+    let requestSplit = JsonApiQueryParser.trimSlashes (endpointString).split (
+      '/'
+    );
 
     requestObject.resourceType = requestSplit[0];
-    requestObject.identifier = (requestSplit.length >= 2 ? requestSplit[1] : null);
-    requestObject.relationships = (requestSplit.length >= 3 && requestSplit[2].toLowerCase() === 'relationships');
+    requestObject.identifier = requestSplit.length >= 2
+      ? requestSplit[1]
+      : null;
+    requestObject.relationships =
+      requestSplit.length >= 3 &&
+      requestSplit[2].toLowerCase () === 'relationships';
 
-    if(requestObject.relationships) {
-      if(!requestSplit[3]) {
-        throw new ReferenceError('Request missing relationship type', 'JsonApiQueryParser.js');
+    if (requestObject.relationships) {
+      if (!requestSplit[3]) {
+        throw new ReferenceError (
+          'Request missing relationship type',
+          'JsonApiQueryParser.js'
+        );
       } else {
-        requestObject.relationshipType = requestSplit[3]
+        requestObject.relationshipType = requestSplit[3];
       }
     } else {
-      requestObject.relationshipType = (requestSplit.length === 3 ? requestSplit[2] : null);
+      requestObject.relationshipType = requestSplit.length === 3
+        ? requestSplit[2]
+        : null;
     }
 
     return requestObject;
@@ -91,11 +105,11 @@ class JsonApiQueryParser {
    *
    **/
   parseQueryParameters (queryString, requestDataSubset) {
-    let querySplit = queryString.split('&');
-    querySplit = querySplit.map(function(queryPart){
-      return decodeURIComponent(queryPart);
+    let querySplit = queryString.split ('&');
+    querySplit = querySplit.map (function (queryPart) {
+      return decodeURIComponent (queryPart);
     });
-    querySplit.forEach(this.delegateToParser, requestDataSubset);
+    querySplit.forEach (this.delegateToParser, requestDataSubset);
 
     return requestDataSubset;
   }
@@ -112,9 +126,12 @@ class JsonApiQueryParser {
     let _requestDataSubset = this;
     let functionName;
 
-    for(functionName in PARSE_PARAM) {
-      if(PARSE_PARAM[functionName].test(query)) {
-        _requestDataSubset = JsonApiQueryParser[functionName](query, _requestDataSubset);
+    for (functionName in PARSE_PARAM) {
+      if (PARSE_PARAM[functionName].test (query)) {
+        _requestDataSubset = JsonApiQueryParser[functionName] (
+          query,
+          _requestDataSubset
+        );
       }
     }
   }
@@ -129,8 +146,8 @@ class JsonApiQueryParser {
    **/
   static parseInclude (includeString, requestDataSubset) {
     // Kept simple for now, does not parse dot-separated relationships (comment.user)
-    let targetString = includeString.split('=')[1];
-    requestDataSubset.include = targetString.split(',');
+    let targetString = includeString.split ('=')[1];
+    requestDataSubset.include = targetString.split (',');
 
     return requestDataSubset;
   }
@@ -149,19 +166,33 @@ class JsonApiQueryParser {
     let targetFieldsString;
     let fieldNameRegex = /^fields.*?\=(.*?)$/i;
 
-    targetResource = fieldsString.replace(PARSE_PARAM.parseFields, function(match, $1, $2, $3) {
+    targetResource = fieldsString.replace (PARSE_PARAM.parseFields, function (
+      match,
+      $1,
+      $2,
+      $3
+    ) {
       return $1;
     });
 
-    targetFieldsString = fieldsString.replace(fieldNameRegex, function(match, $1, $2, $3) {
+    targetFieldsString = fieldsString.replace (fieldNameRegex, function (
+      match,
+      $1,
+      $2,
+      $3
+    ) {
       return $1;
     });
 
-    requestDataSubset.fields[targetResource] = (!requestDataSubset.fields[targetResource] ? [] : requestDataSubset.fields[targetResource]);
-    targetFields = targetFieldsString.split(',');
+    requestDataSubset.fields[targetResource] = !requestDataSubset.fields[
+      targetResource
+    ]
+      ? []
+      : requestDataSubset.fields[targetResource];
+    targetFields = targetFieldsString.split (',');
 
-    targetFields.forEach(function(targetField) {
-      requestDataSubset.fields[targetResource].push(targetField);
+    targetFields.forEach (function (targetField) {
+      requestDataSubset.fields[targetResource].push (targetField);
     });
 
     return requestDataSubset;
@@ -180,11 +211,21 @@ class JsonApiQueryParser {
     let pageSettingValue;
     let pageValueRegex = /^page.*?\=(.*?)$/i;
 
-    pageSettingKey = pageString.replace(PARSE_PARAM.parsePage, function(match, $1, $2, $3) {
+    pageSettingKey = pageString.replace (PARSE_PARAM.parsePage, function (
+      match,
+      $1,
+      $2,
+      $3
+    ) {
       return $1;
     });
 
-    pageSettingValue = pageString.replace(pageValueRegex, function(match, $1, $2, $3) {
+    pageSettingValue = pageString.replace (pageValueRegex, function (
+      match,
+      $1,
+      $2,
+      $3
+    ) {
       return $1;
     });
 
@@ -202,8 +243,8 @@ class JsonApiQueryParser {
    *
    **/
   static parseSort (sortString, requestDataSubset) {
-    let targetString = sortString.split('=')[1];
-    requestDataSubset.sort = targetString.split(',');
+    let targetString = sortString.split ('=')[1];
+    requestDataSubset.sort = targetString.split (',');
 
     return requestDataSubset;
   }
@@ -222,11 +263,21 @@ class JsonApiQueryParser {
     let targetFilterString;
     let filterNameRegex = /^filter.*?\=(.*?)$/i;
 
-    targetColumn = filterString.replace(PARSE_PARAM.parseFilter, function(match, $1, $2, $3) {
+    targetColumn = filterString.replace (PARSE_PARAM.parseFilter, function (
+      match,
+      $1,
+      $2,
+      $3
+    ) {
       return $1;
     });
 
-    targetFilterString = filterString.replace(filterNameRegex, function(match, $1, $2, $3) {
+    targetFilterString = filterString.replace (filterNameRegex, function (
+      match,
+      $1,
+      $2,
+      $3
+    ) {
       return $1;
     });
 
@@ -248,23 +299,61 @@ class JsonApiQueryParser {
     let targetType;
     let targetColumn;
     let targetFilterString;
-    
-    targetType = filterString.replace(PARSE_PARAM.parseFilterType, function(match, $1) {
+
+    targetType = filterString.replace (PARSE_PARAM.parseFilterType, function (
+      match,
+      $1
+    ) {
       return $1;
     });
-    
-    targetColumn = filterString.replace(PARSE_PARAM.parseFilterType, function(match, $1, $2) {
+
+    targetColumn = filterString.replace (PARSE_PARAM.parseFilterType, function (
+      match,
+      $1,
+      $2
+    ) {
       return $2;
     });
 
-    targetFilterString = filterString.replace(PARSE_PARAM.parseFilterType, function(match, $1, $2, $3) {
-      return $3;
-    });
+    targetFilterString = filterString.replace (
+      PARSE_PARAM.parseFilterType,
+      function (match, $1, $2, $3) {
+        return $3;
+      }
+    );
 
-    if(requestDataSubset.filter[targetType]){
+    if (requestDataSubset.filter[targetType]) {
       requestDataSubset.filter[targetType][targetColumn] = targetFilterString;
     }
 
+    return requestDataSubset;
+  }
+
+  static parseFilterWithOr (filterString, requestDataSubset) {
+    const index = parseInt(filterString.replace (PARSE_PARAM.parseFilterWithOr, (match, $1) => $1));
+    const targetFilterFragment = filterString.replace (PARSE_PARAM.parseFilterWithOr, (match, $1, $2) => $2);
+    const subFilterString = `filter${targetFilterFragment}`;
+    const subFilterInitialSet = {
+      filter: {
+        like: {},
+        not: {},
+        lt: {},
+        lte: {},
+        gt: {},
+        gte: {},
+      }
+    };
+    const { filter } = PARSE_PARAM.parseFilter.test (subFilterString)
+      ? JsonApiQueryParser.parseFilter(subFilterString, subFilterInitialSet)
+      : JsonApiQueryParser.parseFilterType(subFilterString, subFilterInitialSet);
+    if (typeof requestDataSubset.filter.or[index] === 'undefined') {
+      requestDataSubset.filter.or[index] = filter;  
+    } else {
+      requestDataSubset.filter.or[index] = JsonApiQueryParser.deepMerge(
+        requestDataSubset.filter.or[index],
+        filter,
+      );  
+    }
     return requestDataSubset;
   }
 
@@ -277,14 +366,30 @@ class JsonApiQueryParser {
    **/
   static trimSlashes (input) {
     let slashPattern = /(^\/)|(\/$)/;
-    let trimmed = input.replace(slashPattern, "");
-    if(slashPattern.test(trimmed)) {
-      return JsonApiQueryParser.trimSlashes(trimmed);
+    let trimmed = input.replace (slashPattern, '');
+    if (slashPattern.test (trimmed)) {
+      return JsonApiQueryParser.trimSlashes (trimmed);
     } else {
       return trimmed;
     }
-  };
+  }
 
+  static deepMerge(target = {}, source = {}) {
+    Object.keys(source).forEach(key => {
+        if (
+            typeof source[key] === 'object' &&
+            !Array.isArray(source[key])
+        ) {
+            if (!target.hasOwnProperty(key)) {
+                target[key] = {};
+            }
+            JsonApiQueryParser.deepMerge(target[key], source[key]);
+        } else {
+            target[key] = source[key];
+        }
+    });
+    return target;
+  }
 }
 
 module.exports = JsonApiQueryParser;
